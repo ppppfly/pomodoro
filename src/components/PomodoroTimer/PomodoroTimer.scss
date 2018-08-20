@@ -1,0 +1,118 @@
+$color1:#45ff45;
+$color2:#21e521;
+$color3:#ff4444;
+$color4:#e52121;
+$color5:#F2F2F2;
+
+@function makelongshadow($color) {
+  $val: 0px 0px $color;
+  @for $i from 1 through 200 {
+    $val: #{$val}, #{$i}px #{$i}px #{$color};
+  }
+  @return $val;
+}
+
+@mixin longshadow($color) {
+  box-shadow: makelongshadow($color);
+}
+
+.container {
+  width:100%;
+  height:100%;
+  min-width:500px;
+  min-height:500px;
+
+  background:$color5;
+  background-size:cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  width:500px;
+  height:500px;
+  background:$color3;
+  border-radius:100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow:hidden;
+  position:relative;
+}
+
+.tomato {
+  width:300px;
+  height:300px;
+  background:$color3;
+  border:15px solid $color5;
+  border-radius:50%;
+  @include longshadow($color4);
+  overflow:hidden;
+  cursor:ew-resize;
+  position:relative;
+  &::before, &::after {
+    content:'';
+    display:block;
+    position:absolute;
+  }
+  &::before {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 10px 20px 10px;
+    border-color: transparent transparent $color5 transparent;
+    left:140px;
+    top:180px;
+  }
+  &::after {
+    content:'Pomodoro';
+    color:$color5;
+    font-family:Fredoka One;
+    font-size:18px;
+    width:100%;
+    text-align:center;
+    top:250px;
+  }
+}
+
+.stem {
+  z-index:2;
+  width:310px;
+  top:-56px;
+  left:75px;
+  height:auto;
+  position:absolute;
+  pointer-events:none;
+  use {
+    fill:$color2;
+  }
+}
+
+.timeline {
+  width:676px;
+  height:50px;
+  position:absolute;
+  top:110px;
+  left:150px;
+  background:url('http://reneroth.org/projects/codepen/pomodoro.png') no-repeat;
+  background-size:100% 100%;
+  //transform:translateX(-315px);
+}
+
+.sound {
+  &::after {
+    content:'\f028';
+    font-family:FontAwesome;
+    color:$color5;
+    font-size:30px;
+  }
+  &.mute::after {
+    content:'\f026';
+  }
+  position:absolute;
+  cursor:pointer;
+  width:28px;
+  top:50px;
+  left:50px;
+}

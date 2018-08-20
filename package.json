@@ -4,8 +4,13 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "ele_start": "electron .",
+    "start": "roadhog server",
+    "build": "roadhog build",
+    "lint": "eslint --ext .js src test",
+    "precommit": "npm run lint"
   },
+  "private": true,
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
     "Electron",
@@ -16,7 +21,25 @@
   ],
   "author": "GitHub",
   "license": "CC0-1.0",
+  "dependencies": {
+    "antd": "^3.8.2",
+    "dva": "^2.4.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "sass": "^1.13.0"
+  },
   "devDependencies": {
-    "electron": "^2.0.0"
+    "babel-plugin-dva-hmr": "^0.3.2",
+    "electron": "^2.0.0",
+    "eslint": "^4.14.0",
+    "eslint-config-umi": "^0.1.1",
+    "eslint-plugin-flowtype": "^2.34.1",
+    "eslint-plugin-import": "^2.6.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0",
+    "husky": "^0.12.0",
+    "redbox-react": "^1.4.3",
+    "roadhog": "^2.0.0",
+    "style-loader": "^0.22.1"
   }
 }
