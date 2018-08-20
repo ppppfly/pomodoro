@@ -1,0 +1,88 @@
+.container {
+  width: 100%;
+  height: 100%;
+  min-width: 500px;
+  min-height: 500px;
+  background: #F2F2F2;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+
+.main {
+  width: 500px;
+  height: 500px;
+  background: #ff4444;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative; }
+
+.tomato {
+  width: 300px;
+  height: 300px;
+  background: #ff4444;
+  border: 15px solid #F2F2F2;
+  border-radius: 50%;
+  box-shadow: 0px 0px #e52121, 1px 1px #e52121, 2px 2px #e52121, 3px 3px #e52121, 4px 4px #e52121, 5px 5px #e52121, 6px 6px #e52121, 7px 7px #e52121, 8px 8px #e52121, 9px 9px #e52121, 10px 10px #e52121, 11px 11px #e52121, 12px 12px #e52121, 13px 13px #e52121, 14px 14px #e52121, 15px 15px #e52121, 16px 16px #e52121, 17px 17px #e52121, 18px 18px #e52121, 19px 19px #e52121, 20px 20px #e52121, 21px 21px #e52121, 22px 22px #e52121, 23px 23px #e52121, 24px 24px #e52121, 25px 25px #e52121, 26px 26px #e52121, 27px 27px #e52121, 28px 28px #e52121, 29px 29px #e52121, 30px 30px #e52121, 31px 31px #e52121, 32px 32px #e52121, 33px 33px #e52121, 34px 34px #e52121, 35px 35px #e52121, 36px 36px #e52121, 37px 37px #e52121, 38px 38px #e52121, 39px 39px #e52121, 40px 40px #e52121, 41px 41px #e52121, 42px 42px #e52121, 43px 43px #e52121, 44px 44px #e52121, 45px 45px #e52121, 46px 46px #e52121, 47px 47px #e52121, 48px 48px #e52121, 49px 49px #e52121, 50px 50px #e52121, 51px 51px #e52121, 52px 52px #e52121, 53px 53px #e52121, 54px 54px #e52121, 55px 55px #e52121, 56px 56px #e52121, 57px 57px #e52121, 58px 58px #e52121, 59px 59px #e52121, 60px 60px #e52121, 61px 61px #e52121, 62px 62px #e52121, 63px 63px #e52121, 64px 64px #e52121, 65px 65px #e52121, 66px 66px #e52121, 67px 67px #e52121, 68px 68px #e52121, 69px 69px #e52121, 70px 70px #e52121, 71px 71px #e52121, 72px 72px #e52121, 73px 73px #e52121, 74px 74px #e52121, 75px 75px #e52121, 76px 76px #e52121, 77px 77px #e52121, 78px 78px #e52121, 79px 79px #e52121, 80px 80px #e52121, 81px 81px #e52121, 82px 82px #e52121, 83px 83px #e52121, 84px 84px #e52121, 85px 85px #e52121, 86px 86px #e52121, 87px 87px #e52121, 88px 88px #e52121, 89px 89px #e52121, 90px 90px #e52121, 91px 91px #e52121, 92px 92px #e52121, 93px 93px #e52121, 94px 94px #e52121, 95px 95px #e52121, 96px 96px #e52121, 97px 97px #e52121, 98px 98px #e52121, 99px 99px #e52121, 100px 100px #e52121, 101px 101px #e52121, 102px 102px #e52121, 103px 103px #e52121, 104px 104px #e52121, 105px 105px #e52121, 106px 106px #e52121, 107px 107px #e52121, 108px 108px #e52121, 109px 109px #e52121, 110px 110px #e52121, 111px 111px #e52121, 112px 112px #e52121, 113px 113px #e52121, 114px 114px #e52121, 115px 115px #e52121, 116px 116px #e52121, 117px 117px #e52121, 118px 118px #e52121, 119px 119px #e52121, 120px 120px #e52121, 121px 121px #e52121, 122px 122px #e52121, 123px 123px #e52121, 124px 124px #e52121, 125px 125px #e52121, 126px 126px #e52121, 127px 127px #e52121, 128px 128px #e52121, 129px 129px #e52121, 130px 130px #e52121, 131px 131px #e52121, 132px 132px #e52121, 133px 133px #e52121, 134px 134px #e52121, 135px 135px #e52121, 136px 136px #e52121, 137px 137px #e52121, 138px 138px #e52121, 139px 139px #e52121, 140px 140px #e52121, 141px 141px #e52121, 142px 142px #e52121, 143px 143px #e52121, 144px 144px #e52121, 145px 145px #e52121, 146px 146px #e52121, 147px 147px #e52121, 148px 148px #e52121, 149px 149px #e52121, 150px 150px #e52121, 151px 151px #e52121, 152px 152px #e52121, 153px 153px #e52121, 154px 154px #e52121, 155px 155px #e52121, 156px 156px #e52121, 157px 157px #e52121, 158px 158px #e52121, 159px 159px #e52121, 160px 160px #e52121, 161px 161px #e52121, 162px 162px #e52121, 163px 163px #e52121, 164px 164px #e52121, 165px 165px #e52121, 166px 166px #e52121, 167px 167px #e52121, 168px 168px #e52121, 169px 169px #e52121, 170px 170px #e52121, 171px 171px #e52121, 172px 172px #e52121, 173px 173px #e52121, 174px 174px #e52121, 175px 175px #e52121, 176px 176px #e52121, 177px 177px #e52121, 178px 178px #e52121, 179px 179px #e52121, 180px 180px #e52121, 181px 181px #e52121, 182px 182px #e52121, 183px 183px #e52121, 184px 184px #e52121, 185px 185px #e52121, 186px 186px #e52121, 187px 187px #e52121, 188px 188px #e52121, 189px 189px #e52121, 190px 190px #e52121, 191px 191px #e52121, 192px 192px #e52121, 193px 193px #e52121, 194px 194px #e52121, 195px 195px #e52121, 196px 196px #e52121, 197px 197px #e52121, 198px 198px #e52121, 199px 199px #e52121, 200px 200px #e52121;
+  overflow: hidden;
+  cursor: ew-resize;
+  position: relative; }
+  .tomato::before, .tomato::after {
+    content: '';
+    display: block;
+    position: absolute; }
+  .tomato::before {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 10px 20px 10px;
+    border-color: transparent transparent #F2F2F2 transparent;
+    left: 140px;
+    top: 180px; }
+  .tomato::after {
+    content: 'Pomodoro';
+    color: #F2F2F2;
+    font-family: Fredoka One;
+    font-size: 18px;
+    width: 100%;
+    text-align: center;
+    top: 250px; }
+
+.stem {
+  z-index: 2;
+  width: 310px;
+  top: -56px;
+  left: 75px;
+  height: auto;
+  position: absolute;
+  pointer-events: none; }
+  .stem use {
+    fill: #21e521; }
+
+.timeline {
+  width: 676px;
+  height: 50px;
+  position: absolute;
+  top: 110px;
+  left: 150px;
+  background: url("http://reneroth.org/projects/codepen/pomodoro.png") no-repeat;
+  background-size: 100% 100%; }
+
+.sound {
+  position: absolute;
+  cursor: pointer;
+  width: 28px;
+  top: 50px;
+  left: 50px; }
+  .sound::after {
+    content: '\f028';
+    font-family: FontAwesome;
+    color: #F2F2F2;
+    font-size: 30px; }
+  .sound.mute::after {
+    content: '\f026'; }
+
+/*# sourceMappingURL=PomodoroTimer.css.map */

@@ -1,5 +1,9 @@
 import React from 'react';
 import styles from './PomodoroTimer.css';
+import './font-awesome.min.css'
+import './font.css'
+import 'howler'
+import {TweenMax} from 'gsap'
 
 class PomodoroTimer extends React.Component {
 
@@ -11,22 +15,22 @@ class PomodoroTimer extends React.Component {
     pixelWidth: 630,
     secondsWidth: 25,
     timeMultiplier: 1000 * 60,
+    tickSound: new Howl({
+      urls: ['http://reneroth.org/projects/codepen/pomodoro_tick.ogg', 'http://reneroth.org/projects/codepen/pomodoro_tick.mp3'],
+      loop: true,
+      volume:0.5
+    }),
+    turnSound: new Howl({
+      urls: ['http://reneroth.org/projects/codepen/pomodoro_turn.ogg', 'http://reneroth.org/projects/codepen/pomodoro_turn.mp3']
+    }),
+    isTickPlaying: false,
+    turnSoundDist: 25 / 2,
+    ringSound: new Howl({
+      urls: ['http://reneroth.org/projects/codepen/pomodoro_ring.ogg', 'http://reneroth.org/projects/codepen/pomodoro_ring.mp3'],
+      volume: 1.0
+    }),
+    lastTurnPos: 0
   };
-
-  let tickSound = new Howl({
-    urls: ['http://reneroth.org/projects/codepen/pomodoro_tick.ogg', 'http://reneroth.org/projects/codepen/pomodoro_tick.mp3'],
-    loop: true,
-    volume:0.5
-  });
-  let turnSound = new Howl({
-    urls: ['http://reneroth.org/projects/codepen/pomodoro_turn.ogg', 'http://reneroth.org/projects/codepen/pomodoro_turn.mp3']
-  });
-  let isTickPlaying = false;
-  let turnSoundDist = 25 / 2;
-  let ringSound = new Howl({
-    urls: ['http://reneroth.org/projects/codepen/pomodoro_ring.ogg', 'http://reneroth.org/projects/codepen/pomodoro_ring.mp3'],
-    volume: 1.0
-  });
 
   tomatoMouseDown = (e) => {
     e.preventDefault();
@@ -35,7 +39,7 @@ class PomodoroTimer extends React.Component {
     })
   };
 
-  const renderTimerStyle = () => {
+  renderTimerStyle = () => {
     return {
       'transform': `translateX(-${pixelPos}px)`,
       '-ms-transform': `translateX(-${pixelPos}px)`,
@@ -44,29 +48,39 @@ class PomodoroTimer extends React.Component {
     }
   };
 
-  let lastTurnPos = 0;
-
   onContainerMouseMover = (e) => {
     e.preventDefault();
+
+    let _lastTurnPos = this.state.lastTurnPos;
+    let _pixelPos = this.state.pixelPos;
+    let _timePos = this.state.timePos;
+
     if (isDragging) {
-      let moveX = e.pageX - oldPosX;
-      pixelPos -= moveX;
-      pixelPos = Math.max(0, Math.min(pixelPos, pixelWidth));
-      timePos = Math.ceil(pixelPos * secondsWidth / pixelWidth * timeMultiplier);
-      this.setState();
+      let moveX = e.pageX - this.state.oldPosX;
+      _pixelPos -= moveX;
+      _pixelPos = Math.max(0, Math.min(_pixelPos, this.state.pixelWidth));
+      let _timePos = Math.ceil(_pixelPos * this.state.secondsWidth / this.state.pixelWidth * this.state.timeMultiplier);
+
       if (moveX > 0) {
-        lastTurnPos = e.pageX;
+        _lastTurnPos = e.pageX;
       }
-      if (e.pageX - lastTurnPos < -turnSoundDist) {
-        if (pixelPos < pixelWidth) {
-          turnSound.play();
+      if (e.pageX - this.state.lastTurnPos < -this.state.turnSoundDist) {
+        if (_pixelPos < this.state.pixelWidth) {
+          this.state.turnSound.play();
         }
-        lastTurnPos = e.pageX;
+        _lastTurnPos = e.pageX;
       }
     } else {
-      lastTurnPos = e.pageX;
+      _lastTurnPos = e.pageX;
     }
-    oldPosX = e.pageX;
+    let _oldPosX = e.pageX;
+
+    this.setState({
+      timePos: _timePos,
+      pixelPos: _pixelPos,
+      lastTurnPos: _lastTurnPos,
+      oldPosX: _oldPosX,
+    });
   };
 
   render() {
@@ -86,7 +100,7 @@ class PomodoroTimer extends React.Component {
             <use xlinkHref="#stempath"/>
           </svg>
           <div className="tomato" onMouseDown={this.tomatoMouseDown}>
-            <div id="timeline" className={styles.timeline} />
+            <div style={this.renderTimerStyle()} className={styles.timeline} />
           </div>
         </div>
 
