@@ -23,6 +23,7 @@ $color5:#F2F2F2;
   min-height:500px;
 
   background:$color5;
+  background-image: url('./img/FF5qM3y.jpg');
   background-size:cover;
   display: flex;
   justify-content: center;
@@ -95,7 +96,7 @@ $color5:#F2F2F2;
   position:absolute;
   top:110px;
   left:150px;
-  background:url('http://reneroth.org/projects/codepen/pomodoro.png') no-repeat;
+  background:url('./img/pomodoro.png') no-repeat;
   background-size:100% 100%;
   //transform:translateX(-315px);
 }

@@ -16,7 +16,7 @@ function IndexPage() {
           <SadMan/>
 
         </Col>
-        <Col xs={2} sm={4} md={6} lg={8} xl={18} className={styles.full}>
+        <Col xs={2} sm={20} md={18} lg={16} xl={18} className={styles.full}>
 
           <PomodoroTimer/>
 

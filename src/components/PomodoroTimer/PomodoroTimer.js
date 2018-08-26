@@ -1,91 +1,180 @@
 import React from 'react';
 import styles from './PomodoroTimer.css';
-import './font-awesome.min.css'
-import './font.css'
-import 'howler'
-import {TweenMax} from 'gsap'
+import 'font-awesome/css/font-awesome.css';
+import './font.css';
+import './sound/pomodoro_ring.mp3';
+import './sound/pomodoro_ring.ogg';
+import './sound/pomodoro_tick.mp3';
+import './sound/pomodoro_tick.ogg';
+import './sound/pomodoro_turn.mp3';
+import './sound/pomodoro_turn.ogg';
+import {Howl} from 'howler';
+import {TweenMax, Power1} from 'gsap';
 
 class PomodoroTimer extends React.Component {
+
+  static defaultProps = {
+    pixelWidth: 630,
+    secondsWidth: 25,
+    timeMultiplier: 1000 * 60,
+    turnSoundDist: 25 / 2,
+    tickSound: new Howl({
+      src: ['./sound/pomodoro_tick.ogg', './sound/pomodoro_tick.mp3'],
+      loop: true,
+      volume:0.5
+    }),
+    turnSound: new Howl({
+      src: ['./sound/pomodoro_turn.ogg', './sound/pomodoro_turn.mp3']
+    }),
+    ringSound: new Howl({
+      src: ['./sound/pomodoro_ring.ogg', './sound/pomodoro_ring.mp3'],
+      volume: 1.0
+    }),
+  };
 
   state = {
     isDragging: false,
     oldPosX: 0,
     pixelPos: 0,
     timePos: 0,
-    pixelWidth: 630,
-    secondsWidth: 25,
-    timeMultiplier: 1000 * 60,
-    tickSound: new Howl({
-      urls: ['http://reneroth.org/projects/codepen/pomodoro_tick.ogg', 'http://reneroth.org/projects/codepen/pomodoro_tick.mp3'],
-      loop: true,
-      volume:0.5
-    }),
-    turnSound: new Howl({
-      urls: ['http://reneroth.org/projects/codepen/pomodoro_turn.ogg', 'http://reneroth.org/projects/codepen/pomodoro_turn.mp3']
-    }),
     isTickPlaying: false,
-    turnSoundDist: 25 / 2,
-    ringSound: new Howl({
-      urls: ['http://reneroth.org/projects/codepen/pomodoro_ring.ogg', 'http://reneroth.org/projects/codepen/pomodoro_ring.mp3'],
-      volume: 1.0
-    }),
-    lastTurnPos: 0
+    lastTurnPos: 0,
+    lastTick: Date.now(),
   };
 
   tomatoMouseDown = (e) => {
     e.preventDefault();
-    this.setState({
-      isDragging: true
-    })
+    this.setState({isDragging: true})
   };
 
   renderTimerStyle = () => {
     return {
-      'transform': `translateX(-${pixelPos}px)`,
-      '-ms-transform': `translateX(-${pixelPos}px)`,
-      '-moz-transform': `translateX(-${pixelPos}px)`,
-      '-webkit-transform': `translateX(-${pixelPos}px)`,
+      'transform': `translateX(-${this.state.pixelPos}px)`
     }
   };
 
-  onContainerMouseMover = (e) => {
-    e.preventDefault();
+  onTouchMove = (e) => {
+    const {secondsWidth, pixelWidth, timeMultiplier, turnSoundDist} = this.props;
+    const {turnSound} = this.props;
 
-    let _lastTurnPos = this.state.lastTurnPos;
-    let _pixelPos = this.state.pixelPos;
-    let _timePos = this.state.timePos;
+    let lastTurnPos = this.state.lastTurnPos;
+    let pixelPos = this.state.pixelPos;
+    let timePos = this.state.timePos;
+    let oldPosX = this.state.oldPosX;
 
-    if (isDragging) {
-      let moveX = e.pageX - this.state.oldPosX;
-      _pixelPos -= moveX;
-      _pixelPos = Math.max(0, Math.min(_pixelPos, this.state.pixelWidth));
-      let _timePos = Math.ceil(_pixelPos * this.state.secondsWidth / this.state.pixelWidth * this.state.timeMultiplier);
+    if (this.state.isDragging) {
+      let moveX = e.pageX - oldPosX;
+      pixelPos -= moveX;
+      pixelPos = Math.max(0, Math.min(pixelPos, pixelWidth));
+      timePos = Math.ceil((pixelPos / pixelWidth) * (secondsWidth * timeMultiplier));
 
       if (moveX > 0) {
-        _lastTurnPos = e.pageX;
+        lastTurnPos = e.pageX;
       }
-      if (e.pageX - this.state.lastTurnPos < -this.state.turnSoundDist) {
-        if (_pixelPos < this.state.pixelWidth) {
-          this.state.turnSound.play();
+      if (e.pageX - lastTurnPos < -turnSoundDist) {
+        if (pixelPos < pixelWidth) {
+          turnSound.play();
         }
-        _lastTurnPos = e.pageX;
+        lastTurnPos = e.pageX;
       }
     } else {
-      _lastTurnPos = e.pageX;
+      lastTurnPos = e.pageX;
     }
-    let _oldPosX = e.pageX;
+    oldPosX = e.pageX;
 
-    this.setState({
-      timePos: _timePos,
-      pixelPos: _pixelPos,
-      lastTurnPos: _lastTurnPos,
-      oldPosX: _oldPosX,
+    this.setState({timePos, pixelPos, lastTurnPos, oldPosX});
+  };
+
+  onContainerMouseMove = (e) => {
+    e.preventDefault();
+    this.onTouchMove(e)
+  };
+
+  onContainerMouseUp = (e) => {
+    e.preventDefault();
+    this.setState({isDragging: false})
+  };
+
+  onTouchEnd = (e) => {
+    this.setState({isDragging: false})
+  };
+
+  doTick = () => {
+
+    const {tickSound, ringSound, secondsWidth, timeMultiplier, pixelWidth} = this.props;
+    let {lastTick, isDragging, timePos, isTickPlaying, pixelPos} = this.state;
+
+    setTimeout(this.doTick, 10); //setTimeout so the timer will continue running even if in the background
+    let tickDuration = Date.now() - lastTick;
+    lastTick = Date.now();
+    if (isDragging || timePos <= 0) {
+      if (isTickPlaying) {
+        tickSound.stop();
+        this.setState({isTickPlaying: false, lastTick})
+      }
+      return;
+    }
+    if (!isTickPlaying) {
+      tickSound.play();
+      isTickPlaying = true
+    }
+    timePos -= tickDuration;
+    timePos = Math.max(0, Math.min(timePos, secondsWidth * timeMultiplier));
+    pixelPos = timePos / secondsWidth * pixelWidth / timeMultiplier;
+    if (timePos === 0) {
+      this.wiggle(this.mainRef.current);
+      ringSound.stop().play();
+    }
+    this.setState({lastTick, isDragging, timePos, isTickPlaying, pixelPos})
+  };
+
+  wiggle = element => {
+
+    /**************
+     Rotation
+     **************/
+    TweenMax.fromTo(element, .07, {
+      x: -4
+    }, {
+      x: 4,
+      ease: Power1.easeInOut,
+      yoyo: true,
+      repeat: 21,
+      onCompleteParams: [element],
+      onComplete: this.resetWiggle
     });
   };
 
+  resetWiggle = element => {
+    TweenMax.to(element, .05, {
+      x: 0,
+      ease: Power1.easeInOut
+    });
+  };
+
+  // $('.sound').click(function (e) {
+  //   e.preventDefault();
+  //   if ($(this).hasClass('mute')) {
+  //     $(this).removeClass('mute');
+  //     tickSound.volume(0.5);
+  //   } else {
+  //     $(this).addClass('mute');
+  //     tickSound.volume(0.0);
+  //   }
+  // });
+
+  componentDidMount = () => {
+    this.mainRef = React.createRef();
+    this.doTick();
+    console.log('---> componentDidMount');
+  };
+
   render() {
+
     return (
-      <div className={styles.container} onMouseMove={this.onContainerMouseMover}>
+      <div className={styles.container}
+           onMouseMove={this.onContainerMouseMove} onTouchMove={this.onContainerMouseMove}
+           onMouseUp={this.onTouchMove} onTouchEnd={this.onTouchEnd}>
 
         <svg style={{'display': 'none'}}>
           <defs>
@@ -94,12 +183,12 @@ class PomodoroTimer extends React.Component {
           </defs>
         </svg>
 
-        <div className={styles.main}>
-          <div className={styles.sound}/>
-          <svg className="stem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <div className={styles.main} ref={this.mainRef}>
+          <div className="sound"/>
+          <svg className={styles.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <use xlinkHref="#stempath"/>
           </svg>
-          <div className="tomato" onMouseDown={this.tomatoMouseDown}>
+          <div className={styles.tomato} onMouseDown={this.tomatoMouseDown}>
             <div style={this.renderTimerStyle()} className={styles.timeline} />
           </div>
         </div>
