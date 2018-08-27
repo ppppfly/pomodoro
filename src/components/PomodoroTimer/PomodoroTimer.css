@@ -24,6 +24,7 @@
 .tomato {
   width: 300px;
   height: 300px;
+  box-sizing: content-box;
   background: #ff4444;
   border: 15px solid #F2F2F2;
   border-radius: 50%;
@@ -43,10 +44,9 @@
     border-color: transparent transparent #F2F2F2 transparent;
     left: 140px;
     top: 180px; }
-  .tomato::after {
-    content: 'Pomodoro';
+  .tomato .title {
+    position: absolute;
     color: #F2F2F2;
-    font-family: Fredoka One;
     font-size: 18px;
     width: 100%;
     text-align: center;
@@ -73,17 +73,12 @@
   background-size: 100% 100%; }
 
 .sound {
+  font-size: 30px;
+  color: #F2F2F2;
   position: absolute;
   cursor: pointer;
   width: 28px;
   top: 50px;
   left: 50px; }
-  .sound::after {
-    content: '\f028';
-    font-family: FontAwesome;
-    color: #F2F2F2;
-    font-size: 30px; }
-  .sound.mute::after {
-    content: '\f026'; }
 
 /*# sourceMappingURL=PomodoroTimer.css.map */

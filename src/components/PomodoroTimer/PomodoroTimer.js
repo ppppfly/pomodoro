@@ -2,14 +2,15 @@ import React from 'react';
 import styles from './PomodoroTimer.css';
 import 'font-awesome/css/font-awesome.css';
 import './font.css';
-import './sound/pomodoro_ring.mp3';
-import './sound/pomodoro_ring.ogg';
-import './sound/pomodoro_tick.mp3';
-import './sound/pomodoro_tick.ogg';
-import './sound/pomodoro_turn.mp3';
-import './sound/pomodoro_turn.ogg';
 import {Howl} from 'howler';
-import {TweenMax, Power1} from 'gsap';
+import {Power1, TweenMax} from 'gsap';
+
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faVolumeUp, faVolumeMute} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faVolumeUp);
+library.add(faVolumeMute);
 
 class PomodoroTimer extends React.Component {
 
@@ -40,6 +41,7 @@ class PomodoroTimer extends React.Component {
     isTickPlaying: false,
     lastTurnPos: 0,
     lastTick: Date.now(),
+    isMute: false
   };
 
   tomatoMouseDown = (e) => {
@@ -53,7 +55,9 @@ class PomodoroTimer extends React.Component {
     }
   };
 
-  onTouchMove = (e) => {
+  onContainerMouseMove = (e) => {
+    e.preventDefault();
+
     const {secondsWidth, pixelWidth, timeMultiplier, turnSoundDist} = this.props;
     const {turnSound} = this.props;
 
@@ -85,17 +89,8 @@ class PomodoroTimer extends React.Component {
     this.setState({timePos, pixelPos, lastTurnPos, oldPosX});
   };
 
-  onContainerMouseMove = (e) => {
-    e.preventDefault();
-    this.onTouchMove(e)
-  };
-
   onContainerMouseUp = (e) => {
     e.preventDefault();
-    this.setState({isDragging: false})
-  };
-
-  onTouchEnd = (e) => {
     this.setState({isDragging: false})
   };
 
@@ -166,15 +161,34 @@ class PomodoroTimer extends React.Component {
   componentDidMount = () => {
     this.mainRef = React.createRef();
     this.doTick();
-    console.log('---> componentDidMount');
   };
+
+  getIconName(){
+    if (this.state.isMute) {
+      return 'volume-mute'
+    }
+    return 'volume-up'
+  }
+
+  changeIcon(){
+    const {tickSound} = this.props;
+
+    if (this.state.isMute) {
+      tickSound.volume(0.5);
+      this.setState({isMute: false})
+    } else {
+      tickSound.volume(0.0);
+      this.setState({isMute: true})
+    }
+
+  }
 
   render() {
 
     return (
       <div className={styles.container}
-           onMouseMove={this.onContainerMouseMove} onTouchMove={this.onContainerMouseMove}
-           onMouseUp={this.onTouchMove} onTouchEnd={this.onTouchEnd}>
+           onMouseMove={this.onContainerMouseMove}
+           onMouseUp={this.onContainerMouseUp}>
 
         <svg style={{'display': 'none'}}>
           <defs>
@@ -184,11 +198,12 @@ class PomodoroTimer extends React.Component {
         </svg>
 
         <div className={styles.main} ref={this.mainRef}>
-          <div className="sound"/>
+          <FontAwesomeIcon className={styles.sound} icon={this.getIconName()} onClick={this.changeIcon.bind(this)}/>
           <svg className={styles.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <use xlinkHref="#stempath"/>
           </svg>
           <div className={styles.tomato} onMouseDown={this.tomatoMouseDown}>
+            <div className={styles.title}>番茄钟</div>
             <div style={this.renderTimerStyle()} className={styles.timeline} />
           </div>
         </div>
