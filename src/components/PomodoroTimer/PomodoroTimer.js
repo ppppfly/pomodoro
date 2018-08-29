@@ -26,6 +26,9 @@ class PomodoroTimer extends React.Component {
       new Howl({src: ['./sound/tick/timer.mp3'], loop: true, volume: 0.5}),
       new Howl({src: ['./sound/tick/clock.mp3'], loop: true, volume: 0.5}),
     ],
+    restSounds: [
+      new Howl({src: ['./sound/rest/rest.mp3'], loop: true, volume: 0.8})
+    ],
     turnSounds: [
       new Howl({src: ['./sound/pomodoro_turn.mp3'], volume: 1.0}),
     ],
@@ -45,6 +48,7 @@ class PomodoroTimer extends React.Component {
     isMute: false,
     showDrawer: false,
     fileList: [],
+    isRest: false,
     tickSound: this.props.tickSounds[0],
     ringSound: this.props.ringSounds[0],
     turnSound: this.props.turnSounds[0],
@@ -211,7 +215,52 @@ class PomodoroTimer extends React.Component {
     this.setState({tickSound});
   }
 
+  shiftWork() {
+
+    const {isTickPlaying, tickSound} = this.state;
+
+    if (isTickPlaying) {
+      tickSound.stop();
+    }
+
+    this.setState({
+      isRest: false,
+      tickSound: this.props.tickSounds[0],
+      isDragging: false,
+      oldPosX: 0,
+      pixelPos: 0,
+      timePos: 0,
+      isTickPlaying: false,
+      lastTurnPos: 0,
+      lastTick: Date.now(),
+    })
+
+  }
+
+  shiftRest() {
+
+    const {isTickPlaying, tickSound} = this.state;
+
+    if (isTickPlaying) {
+      tickSound.stop();
+    }
+
+    this.setState({
+      isRest: true,
+      tickSound: this.props.restSounds[0],
+      isDragging: false,
+      oldPosX: 0,
+      pixelPos: 0,
+      timePos: 0,
+      isTickPlaying: false,
+      lastTurnPos: 0,
+      lastTick: Date.now(),
+    });
+  }
+
   render() {
+
+    const {tickSound} = this.state;
 
     const marks = {
       0: '0',
@@ -235,7 +284,7 @@ class PomodoroTimer extends React.Component {
         >
           <Collapse>
             <Panel header="音量控制" key="1">
-              <Slider marks={marks} defaultValue={50} onChange={this.onVolumeChange.bind(this)}/>
+              <Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>
             </Panel>
             <Panel header="声音：滴答声" key="2">
               <RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>
@@ -254,7 +303,7 @@ class PomodoroTimer extends React.Component {
           </defs>
         </svg>
 
-        <div className={styles.main} ref={this.mainRef}>
+        <div className={this.state.isRest ? styles.rest_main : styles.main } ref={this.mainRef}>
           <FontAwesomeIcon className={styles.sound} icon={this.getIconName()} onClick={this.muteOrOpen.bind(this)}/>
           <svg className={styles.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <use xlinkHref="#stempath"/>
@@ -262,6 +311,10 @@ class PomodoroTimer extends React.Component {
           <div className={styles.tomato} onMouseDown={this.tomatoMouseDown}>
             <div className={styles.title}>番茄钟</div>
             <div style={this.renderTimerStyle()} className={styles.timeline} />
+          </div>
+          <div className={styles.shifter}>
+            <div className={styles.work} onClick={this.shiftWork.bind(this)}/>
+            <div className={styles.rest} onClick={this.shiftRest.bind(this)}/>
           </div>
         </div>
 

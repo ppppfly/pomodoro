@@ -1,7 +1,10 @@
 $color1: #45ff45;
 $color2: #21e521;
+$color2-1: #ffb700;
 $color3: #ff4444;
+$color3-1: #68a662;
 $color4: #e52121;
+$color4-1: darken(#68a662, 10%);
 $color5: #F2F2F2;
 
 @function makelongshadow($color) {
@@ -44,6 +47,18 @@ $color5: #F2F2F2;
   transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
   &:hover {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  }
+}
+
+.rest_main {
+  @extend .main;
+  background: $color3-1;
+  .tomato {
+    background: $color3-1;
+    @include longshadow($color4-1);
+  }
+  .stem {
+    fill: $color2-1;
   }
 }
 
@@ -90,9 +105,7 @@ $color5: #F2F2F2;
   height: auto;
   position: absolute;
   pointer-events: none;
-  use {
-    fill: $color2;
-  }
+  fill: $color2;
 }
 
 .timeline {
@@ -114,4 +127,37 @@ $color5: #F2F2F2;
   width: 28px;
   top: 50px;
   left: 50px;
+}
+
+.shifter {
+  position: absolute;
+  bottom: 35px;
+  width: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+
+  .rest {
+    background-color: $color3-1;
+  }
+
+  .work {
+    background-color: $color3;
+  }
+}
+
+.shifter div {
+  display: inline;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  border: solid 1px whitesmoke;
+  transition: all 0.3s;
+  cursor: pointer;
+  &:hover {
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+  }
 }
