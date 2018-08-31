@@ -4,16 +4,17 @@ import 'font-awesome/css/font-awesome.css';
 import './font.css';
 import {Howl} from 'howler';
 import {Power1, TweenMax} from 'gsap';
-import {Collapse, Drawer, Radio, Slider} from 'antd';
+import {Drawer, Radio} from 'antd';
 
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCog, faVolumeMute, faVolumeUp} from '@fortawesome/free-solid-svg-icons';
+import {faCog, faVolumeOff, faVolumeUp} from '@fortawesome/free-solid-svg-icons';
+import Responsive from 'react-responsive';
 
-library.add(faVolumeUp, faVolumeMute, faCog);
-const Panel = Collapse.Panel;
+library.add(faVolumeUp, faVolumeOff, faCog);
 const RadioGroup = Radio.Group;
-
+const Mobile = props => <Responsive {...props} maxWidth={499} />;
+const Default = props => <Responsive {...props} minWidth={500} />;
 
 class PomodoroTimer extends React.Component {
 
@@ -52,6 +53,7 @@ class PomodoroTimer extends React.Component {
     tickSound: this.props.tickSounds[0],
     ringSound: this.props.ringSounds[0],
     turnSound: this.props.turnSounds[0],
+    touchPageX: 0
   };
 
   tomatoMouseDown = (e) => {
@@ -65,38 +67,40 @@ class PomodoroTimer extends React.Component {
     }
   };
 
-  onContainerMouseMove = (e) => {
-    e.preventDefault();
-
+  handleMove(pageX) {
     const {secondsWidth, pixelWidth, timeMultiplier, turnSoundDist} = this.props;
     const {turnSound} = this.state;
+    let {lastTurnPos, pixelPos, timePos, oldPosX} = this.state;
 
-    let lastTurnPos = this.state.lastTurnPos;
-    let pixelPos = this.state.pixelPos;
-    let timePos = this.state.timePos;
-    let oldPosX = this.state.oldPosX;
 
     if (this.state.isDragging) {
-      let moveX = e.pageX - oldPosX;
+      let moveX = pageX - oldPosX;
       pixelPos -= moveX;
       pixelPos = Math.max(0, Math.min(pixelPos, pixelWidth));
       timePos = Math.ceil((pixelPos / pixelWidth) * (secondsWidth * timeMultiplier));
 
       if (moveX > 0) {
-        lastTurnPos = e.pageX;
+        lastTurnPos = pageX;
       }
-      if (e.pageX - lastTurnPos < -turnSoundDist) {
+
+      if (pageX - lastTurnPos < -turnSoundDist) {
         if (pixelPos < pixelWidth) {
           turnSound.play();
         }
-        lastTurnPos = e.pageX;
+        lastTurnPos = pageX;
       }
     } else {
-      lastTurnPos = e.pageX;
+      lastTurnPos = pageX;
     }
-    oldPosX = e.pageX;
+    oldPosX = pageX;
 
     this.setState({timePos, pixelPos, lastTurnPos, oldPosX});
+
+  }
+
+  onContainerMouseMove = (e) => {
+    e.preventDefault();
+    this.handleMove.bind(this)(e.pageX)
   };
 
   onContainerMouseUp = (e) => {
@@ -165,7 +169,7 @@ class PomodoroTimer extends React.Component {
 
   getIconName(){
     if (this.state.isMute) {
-      return 'volume-mute'
+      return 'volume-off'
     }
     return 'volume-up'
   }
@@ -187,8 +191,9 @@ class PomodoroTimer extends React.Component {
     this.setState({showDrawer: true})
   }
 
-  onClose() {
-    this.setState({showDrawer: false})
+  onDrawerOpenChange() {
+    console.log('--->', this.state.showDrawer);
+    this.setState({showDrawer: !this.state.showDrawer})
   }
 
   onVolumeChange(volume){
@@ -200,7 +205,6 @@ class PomodoroTimer extends React.Component {
     const value = e.target.value;
     const {tickSounds} = this.props;
     let {tickSound, isTickPlaying} = this.state;
-    console.log(typeof value, value);
     if (isTickPlaying) {
       tickSound.stop();
       tickSound = tickSounds[value];
@@ -258,6 +262,37 @@ class PomodoroTimer extends React.Component {
     });
   }
 
+  static handlePreventDefault(event) {
+    // 判断默认行为是否可以被禁用
+    if (event.cancelable) {
+      // 判断默认行为是否已经被禁用
+      if (!event.defaultPrevented) {
+        event.preventDefault();
+      }
+    }
+  }
+
+  onTouchStart(e) {
+    PomodoroTimer.handlePreventDefault(e);
+    const pageX = e.touches[0].pageX;
+    this.setState({
+      isDragging: true,
+      oldPosX: pageX,
+      lastTurnPos: pageX,
+    });
+  }
+
+  onTouchMove(e) {
+    PomodoroTimer.handlePreventDefault(e);
+    const pageX = e.touches[0].pageX;
+    this.handleMove.bind(this)(pageX);
+  }
+
+  onTouchEnd(e) {
+    PomodoroTimer.handlePreventDefault(e);
+    this.setState({isDragging: false});
+  }
+
   render() {
 
     const {tickSound} = this.state;
@@ -270,29 +305,35 @@ class PomodoroTimer extends React.Component {
 
     return (
       <div className={styles.container}
-           onMouseMove={this.onContainerMouseMove}
-           onMouseUp={this.onContainerMouseUp}>
+           onMouseMove={this.onContainerMouseMove.bind(this)}
+           onMouseUp={this.onContainerMouseUp.bind(this)}
+           onTouchMove={this.onTouchMove.bind(this)}
+           onTouchEnd={this.onTouchEnd.bind(this)}
+      >
 
-        <FontAwesomeIcon className={styles.sound} icon="cog" onClick={this.showDrawer.bind(this)}/>
+        <FontAwesomeIcon className={styles.sound} icon="cog"
+                         onClick={this.onDrawerOpenChange.bind(this)}
+                         onTouchStart={this.onDrawerOpenChange.bind(this)}/>
 
         <Drawer
           title="设置"
           placement="left"
           closable={false}
-          onClose={this.onClose.bind(this)}
+          onClose={this.onDrawerOpenChange.bind(this)}
           visible={this.state.showDrawer}
         >
-          <Collapse>
-            <Panel header="音量控制" key="1">
-              <Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>
-            </Panel>
-            <Panel header="声音：滴答声" key="2">
-              <RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>
-                <Radio value={0}>计时器</Radio>
-                <Radio value={1}>钟表（感谢叶开提供）</Radio>
-              </RadioGroup>
-            </Panel>
-          </Collapse>
+          {/*<Collapse>*/}
+            {/*<Panel header="音量控制" key="1">*/}
+              {/*<Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>*/}
+            {/*</Panel>*/}
+            {/*<Panel header="声音：滴答声" key="2">*/}
+              {/*<RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>*/}
+                {/*<Radio value={0}>计时器</Radio>*/}
+                {/*<Radio value={1}>钟表（感谢叶开提供）</Radio>*/}
+              {/*</RadioGroup>*/}
+            {/*</Panel>*/}
+          {/*</Collapse>*/}
+          点击
 
         </Drawer>
 
@@ -304,17 +345,23 @@ class PomodoroTimer extends React.Component {
         </svg>
 
         <div className={this.state.isRest ? styles.rest_main : styles.main } ref={this.mainRef}>
-          <FontAwesomeIcon className={styles.sound} icon={this.getIconName()} onClick={this.muteOrOpen.bind(this)}/>
+          <FontAwesomeIcon className={styles.sound} icon={this.getIconName()}
+                           onClick={this.muteOrOpen.bind(this)} onTouchStart={this.muteOrOpen.bind(this)}/>
           <svg className={styles.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <use xlinkHref="#stempath"/>
           </svg>
-          <div className={styles.tomato} onMouseDown={this.tomatoMouseDown}>
-            <div className={styles.title}>番茄钟</div>
+          <div className={styles.tomato} onMouseDown={this.tomatoMouseDown.bind(this)} onTouchStart={this.onTouchStart.bind(this)}>
+            <div className={styles.title}>番茄钟
+              <div>
+                <Mobile>Mobile</Mobile>
+                <Default>Not mobile</Default>
+              </div>
+            </div>
             <div style={this.renderTimerStyle()} className={styles.timeline} />
           </div>
           <div className={styles.shifter}>
-            <div className={styles.work} onClick={this.shiftWork.bind(this)}/>
-            <div className={styles.rest} onClick={this.shiftRest.bind(this)}/>
+            <div className={styles.work} onClick={this.shiftWork.bind(this)} onTouchStart={this.shiftWork.bind(this)}/>
+            <div className={styles.rest} onClick={this.shiftRest.bind(this)}  onTouchStart={this.shiftRest.bind(this)}/>
           </div>
         </div>
 
