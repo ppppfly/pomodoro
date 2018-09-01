@@ -25,20 +25,20 @@ class PomodoroTimer extends React.Component {
     timeMultiplier: 1000 * 60,
     turnSoundDist: 25 / 2,
     tickSounds: [
-      new Howl({src: ['./sound/tick/timer.mp3'], loop: true, volume: 0.5}),
-      new Howl({src: ['./sound/tick/clock.mp3'], loop: true, volume: 0.5}),
+      new Howl({src: ['./sound/tick/timer.mp3'], loop: true, volume: 0.6}),
+      new Howl({src: ['./sound/tick/clock.mp3'], loop: true, volume: 0.6}),
     ],
     restSounds: [
-      new Howl({src: ['./sound/rest/rest.mp3'], loop: true, volume: 0.8})
+      new Howl({src: ['./sound/rest/rest.mp3'], loop: true, volume: 0.6})
     ],
     turnSounds: [
       new Howl({src: ['./sound/pomodoro_turn.mp3'], volume: 1.0}),
     ],
     ringSounds: [
-      new Howl({src: ['./sound/pomodoro_ring.mp3'], volume: 1.0}),
+      new Howl({src: ['./sound/pomodoro_ring.mp3'], volume: 0.6}),
     ],
     dingSounds: [
-      new Howl({src: ['./sound/ding.mp3'], volume: 0.5}),
+      new Howl({src: ['./sound/ding.mp3'], volume: 0.6}),
     ],
   };
 
@@ -54,13 +54,16 @@ class PomodoroTimer extends React.Component {
     showDrawer: false,
     fileList: [],
     isRest: false,
+    volume: 0.6,
     tickSound: this.props.tickSounds[0],
     ringSound: this.props.ringSounds[0],
     turnSound: this.props.turnSounds[0],
     dingSound: this.props.dingSounds[0],
+    restSound: this.props.restSounds[0],
     touchPageX: 0,
     isDingRing: false, // 标记：是否已经提醒了：倒数一分钟，提醒用户准备结束工作
     willLastMinuteCheck: false, //设置：是否开启 最后一分钟提醒
+    willContinueHalfMinute: false, //设置：是否开启 结束后马上半分钟脑波音乐
   };
 
   tomatoMouseDown = (e) => {
@@ -76,11 +79,11 @@ class PomodoroTimer extends React.Component {
 
   handleMove(pageX) {
     const {secondsWidth, pixelWidth, timeMultiplier, turnSoundDist} = this.props;
-    const {turnSound} = this.state;
+    const {turnSound, restSound} = this.state;
     let {lastTurnPos, pixelPos, timePos, oldPosX, isDingRing} = this.state;
 
-
     if (this.state.isDragging) {
+      restSound.stop();
       let moveX = pageX - oldPosX;
       pixelPos -= moveX;
       pixelPos = Math.max(0, Math.min(pixelPos, pixelWidth));
@@ -88,11 +91,7 @@ class PomodoroTimer extends React.Component {
 
       if (moveX > 0) {
         lastTurnPos = pageX;
-        if (timePos > timeMultiplier) {
-          isDingRing = false;
-        } else {
-          isDingRing = true;
-        }
+        isDingRing = timePos <= timeMultiplier;
       }
 
       if (pageX - lastTurnPos < -turnSoundDist) {
@@ -118,6 +117,36 @@ class PomodoroTimer extends React.Component {
     e.preventDefault();
     this.setState({isDragging: false})
   };
+
+  playRestSound(duration, seek=82) {
+
+    const {restSound} = this.state;
+
+    if (duration && duration>=0) {
+      if (seek) {
+        restSound.stop().seek(seek);
+      }
+      restSound.play();
+
+      // 限制音乐的播放时间
+      setTimeout(() => {
+        // 停止时，有1.5秒的衰变，听起来不会太突兀
+        restSound.fade(restSound.volume(), 0.0, 1500);
+
+        // 不要马上骤停，但也不要一直播放
+        setTimeout(() => {
+          restSound.stop();
+        }, 2000)
+
+      }, duration);
+
+    } else {
+      if (seek) {
+        restSound.stop().seek(seek);
+      }
+      restSound.play();
+    }
+  }
 
   doTick = () => {
 
@@ -153,6 +182,13 @@ class PomodoroTimer extends React.Component {
     if (timePos === 0) {
       this.wiggle(this.mainRef.current);
       ringSound.stop().play();
+
+      const {isRest, willContinueHalfMinute} = this.state;
+
+      // 功能：工作番茄后，来一段30秒的脑波音乐
+      if (!isRest && willContinueHalfMinute) {
+        this.playRestSound(30*1000)
+      }
     }
     this.setState({lastTick, isDragging, timePos, isTickPlaying, pixelPos, isDingRing})
   };
@@ -194,13 +230,19 @@ class PomodoroTimer extends React.Component {
   }
 
   muteOrOpen(){
-    const {tickSound} = this.state;
+    const {volume, tickSound, ringSound, dingSound, restSound} = this.state;
 
     if (this.state.isMute) {
-      tickSound.volume(0.5);
+      tickSound.volume(volume);
+      ringSound.volume(volume);
+      dingSound.volume(volume);
+      restSound.volume(volume);
       this.setState({isMute: false})
     } else {
       tickSound.volume(0.0);
+      ringSound.volume(0.0);
+      dingSound.volume(0.0);
+      restSound.volume(0.0);
       this.setState({isMute: true})
     }
 
@@ -215,8 +257,12 @@ class PomodoroTimer extends React.Component {
   }
 
   onVolumeChange(volume){
-    const {tickSound} = this.state;
+    const {tickSound, ringSound, dingSound, restSound} = this.state;
     tickSound.volume(volume/100);
+    ringSound.volume(volume/100);
+    dingSound.volume(volume/100);
+    restSound.volume(volume/100);
+    this.setState({volume: volume/100})
   }
 
   getOnTickSoundChange(e) {
@@ -239,11 +285,13 @@ class PomodoroTimer extends React.Component {
 
   shiftWork() {
 
-    const {isTickPlaying, tickSound} = this.state;
+    const {isTickPlaying, tickSound, restSound} = this.state;
 
     if (isTickPlaying) {
       tickSound.stop();
     }
+
+    restSound.stop();
 
     this.setState({
       isRest: false,
@@ -262,11 +310,13 @@ class PomodoroTimer extends React.Component {
 
   shiftRest() {
 
-    const {isTickPlaying, tickSound} = this.state;
+    const {isTickPlaying, tickSound, restSound} = this.state;
 
     if (isTickPlaying) {
       tickSound.stop();
     }
+
+    restSound.stop();
 
     this.setState({
       isRest: true,
@@ -333,17 +383,26 @@ class PomodoroTimer extends React.Component {
     this.setState({willLastMinuteCheck: !this.state.willLastMinuteCheck})
   }
 
-  componentPomodoro(myStyle) {
+  onWorkContinueHalfMinuteChange() {
+    this.setState({willContinueHalfMinute: !this.state.willContinueHalfMinute})
+  }
 
-    const {tickSound, isRest} = this.state;
+  componentPomodoro(myStyle, isMobile) {
+
+    const {isRest, volume} = this.state;
 
     const marks = {0: '0', 50: '50', 100: '100'};
 
     const restStyle = PomodoroTimer.genRestInlineStyle(isRest);
+    const volumeIcon = <FontAwesomeIcon className={myStyle.sound} icon={this.getIconName()} onClick={this.muteOrOpen.bind(this)}/>;
 
     return <div className={myStyle.container} style={restStyle.container}>
 
-      <FontAwesomeIcon className={styles.sound} icon="cog" onClick={this.onDrawerOpenChange.bind(this)}/>
+      <FontAwesomeIcon className={styles.config} icon="cog" onClick={this.onDrawerOpenChange.bind(this)}/>
+
+      <div className={styles.icon_wrapper}>
+        { isMobile ? volumeIcon : ''}
+      </div>
 
       <Drawer
         title="设置"
@@ -355,13 +414,15 @@ class PomodoroTimer extends React.Component {
       >
         <Collapse>
           <Panel header="模式控制" key="1">
-            <h4>是否开启：最后一分钟 提醒</h4>
+            <h4>最后一分钟提醒</h4>
             <Switch onChange={this.onLastMinuteTipChange.bind(this)} />
+            <h4>工作番茄后，持续30秒的脑波音乐</h4>
+            <Switch onChange={this.onWorkContinueHalfMinuteChange.bind(this)} />
           </Panel>
-          <Panel header="音量控制" key="1">
-            <Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>
+          <Panel header="音量控制" key="2">
+            <Slider marks={marks} value={volume*100} onChange={this.onVolumeChange.bind(this)}/>
           </Panel>
-          <Panel header="声音：滴答声" key="2">
+          <Panel header="声音：滴答声" key="3">
             <RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>
               <Radio value={0}>计时器</Radio>
               <Radio value={1}>钟表（感谢叶开提供）</Radio>
@@ -371,7 +432,9 @@ class PomodoroTimer extends React.Component {
       </Drawer>
 
       <div className={this.state.isRest ? myStyle.mainRest : myStyle.main } ref={this.mainRef}>
-        <FontAwesomeIcon className={styles.sound} icon={this.getIconName()} onClick={this.muteOrOpen.bind(this)}/>
+
+        {isMobile ? '' : volumeIcon}
+
         <svg className={myStyle.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
           <use xlinkHref="#stempath"/>
         </svg>
@@ -394,7 +457,8 @@ class PomodoroTimer extends React.Component {
       main: styles[`main-${type}`],
       mainRest: styles[`main-${type}-rest`],
       stem: styles[`stem-${type}`],
-      shifter: styles[`shifter-${type}`]
+      shifter: styles[`shifter-${type}`],
+      sound: styles[`sound-${type}`],
     };
   }
 
@@ -408,7 +472,8 @@ class PomodoroTimer extends React.Component {
            onTouchMove={this.onTouchMove.bind(this)}
            onTouchEnd={this.onTouchEnd.bind(this)}
            onMouseMove={this.onContainerMouseMove.bind(this)}
-           onMouseUp={this.onContainerMouseUp.bind(this)}>
+           onMouseUp={this.onContainerMouseUp.bind(this)}
+      >
 
         <svg style={{'display': 'none'}}>
           <defs>
@@ -419,12 +484,12 @@ class PomodoroTimer extends React.Component {
 
         <Mobile>
 
-          {this.componentPomodoro(styleMobile)}
+          {this.componentPomodoro(styleMobile, true)}
 
         </Mobile>
         <Default>
 
-          {this.componentPomodoro(styleDesktop)}
+          {this.componentPomodoro(styleDesktop, false)}
 
         </Default>
       </div>

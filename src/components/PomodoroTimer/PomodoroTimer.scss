@@ -151,14 +151,34 @@ $color5: #F2F2F2;
   //transform:translateX(-315px);
 }
 
-.sound {
+@mixin icon {
   font-size: 30px;
   color: $color5;
   position: absolute;
   cursor: pointer;
   width: 28px;
+}
+
+.config {
+  @include icon;
   top: 50px;
   left: 50px;
+}
+
+.sound-desktop {
+  @include icon;
+  top: 50px;
+  left: 50px;
+}
+
+.icon_wrapper {
+  position: absolute;
+  top: 50px;
+  right: 85px;
+}
+
+.sound-mobile {
+  @include icon;
 }
 
 .shifter-desktop {

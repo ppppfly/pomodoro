@@ -106,7 +106,7 @@
   background: url("./img/pomodoro.png") no-repeat;
   background-size: 100% 100%; }
 
-.sound {
+.config {
   font-size: 30px;
   color: #F2F2F2;
   position: absolute;
@@ -114,6 +114,27 @@
   width: 28px;
   top: 50px;
   left: 50px; }
+
+.sound-desktop {
+  font-size: 30px;
+  color: #F2F2F2;
+  position: absolute;
+  cursor: pointer;
+  width: 28px;
+  top: 50px;
+  left: 50px; }
+
+.icon_wrapper {
+  position: absolute;
+  top: 50px;
+  right: 85px; }
+
+.sound-mobile {
+  font-size: 30px;
+  color: #F2F2F2;
+  position: absolute;
+  cursor: pointer;
+  width: 28px; }
 
 .shifter-desktop, .shifter-mobile {
   position: absolute;
