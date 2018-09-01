@@ -4,7 +4,7 @@ import 'font-awesome/css/font-awesome.css';
 import './font.css';
 import {Howl} from 'howler';
 import {Power1, TweenMax} from 'gsap';
-import {Drawer, Radio, Collapse, Slider} from 'antd';
+import {Drawer, Radio, Collapse, Slider, Switch} from 'antd';
 
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -37,6 +37,9 @@ class PomodoroTimer extends React.Component {
     ringSounds: [
       new Howl({src: ['./sound/pomodoro_ring.mp3'], volume: 1.0}),
     ],
+    dingSounds: [
+      new Howl({src: ['./sound/ding.mp3'], volume: 0.5}),
+    ],
   };
 
   state = {
@@ -54,7 +57,10 @@ class PomodoroTimer extends React.Component {
     tickSound: this.props.tickSounds[0],
     ringSound: this.props.ringSounds[0],
     turnSound: this.props.turnSounds[0],
-    touchPageX: 0
+    dingSound: this.props.dingSounds[0],
+    touchPageX: 0,
+    isDingRing: false, // 标记：是否已经提醒了：倒数一分钟，提醒用户准备结束工作
+    willLastMinuteCheck: false, //设置：是否开启 最后一分钟提醒
   };
 
   tomatoMouseDown = (e) => {
@@ -71,7 +77,7 @@ class PomodoroTimer extends React.Component {
   handleMove(pageX) {
     const {secondsWidth, pixelWidth, timeMultiplier, turnSoundDist} = this.props;
     const {turnSound} = this.state;
-    let {lastTurnPos, pixelPos, timePos, oldPosX} = this.state;
+    let {lastTurnPos, pixelPos, timePos, oldPosX, isDingRing} = this.state;
 
 
     if (this.state.isDragging) {
@@ -82,6 +88,11 @@ class PomodoroTimer extends React.Component {
 
       if (moveX > 0) {
         lastTurnPos = pageX;
+        if (timePos > timeMultiplier) {
+          isDingRing = false;
+        } else {
+          isDingRing = true;
+        }
       }
 
       if (pageX - lastTurnPos < -turnSoundDist) {
@@ -95,8 +106,7 @@ class PomodoroTimer extends React.Component {
     }
     oldPosX = pageX;
 
-    this.setState({timePos, pixelPos, lastTurnPos, oldPosX});
-
+    this.setState({timePos, pixelPos, lastTurnPos, oldPosX, isDingRing});
   }
 
   onContainerMouseMove = (e) => {
@@ -112,8 +122,10 @@ class PomodoroTimer extends React.Component {
   doTick = () => {
 
     const {secondsWidth, timeMultiplier, pixelWidth} = this.props;
-    const {tickSound, ringSound} = this.state;
-    let {lastTick, isDragging, timePos, isTickPlaying, pixelPos} = this.state;
+    const {tickSound, ringSound, dingSound} = this.state;
+    let {lastTick, isDragging, timePos, isTickPlaying, pixelPos, isDingRing} = this.state;
+    // 配置项
+    let {willLastMinuteCheck} = this.state;
 
     setTimeout(this.doTick, 10); //setTimeout so the timer will continue running even if in the background
     let tickDuration = Date.now() - lastTick;
@@ -132,11 +144,17 @@ class PomodoroTimer extends React.Component {
     timePos -= tickDuration;
     timePos = Math.max(0, Math.min(timePos, secondsWidth * timeMultiplier));
     pixelPos = timePos / secondsWidth * pixelWidth / timeMultiplier;
+
+    if (willLastMinuteCheck && timePos <= timeMultiplier && !isDingRing) {
+      dingSound.stop().play();
+      isDingRing = true;
+    }
+
     if (timePos === 0) {
       this.wiggle(this.mainRef.current);
       ringSound.stop().play();
     }
-    this.setState({lastTick, isDragging, timePos, isTickPlaying, pixelPos})
+    this.setState({lastTick, isDragging, timePos, isTickPlaying, pixelPos, isDingRing})
   };
 
   wiggle = element => {
@@ -237,6 +255,7 @@ class PomodoroTimer extends React.Component {
       isTickPlaying: false,
       lastTurnPos: 0,
       lastTick: Date.now(),
+      isDingRing: false,
     })
 
   }
@@ -259,6 +278,7 @@ class PomodoroTimer extends React.Component {
       isTickPlaying: false,
       lastTurnPos: 0,
       lastTick: Date.now(),
+      isDingRing: false,
     });
   }
 
@@ -309,6 +329,10 @@ class PomodoroTimer extends React.Component {
     return restStyle;
   }
 
+  onLastMinuteTipChange() {
+    this.setState({willLastMinuteCheck: !this.state.willLastMinuteCheck})
+  }
+
   componentPomodoro(myStyle) {
 
     const {tickSound, isRest} = this.state;
@@ -327,8 +351,13 @@ class PomodoroTimer extends React.Component {
         closable={true}
         onClose={this.onClose}
         visible={this.state.showDrawer}
+        width={300}
       >
         <Collapse>
+          <Panel header="模式控制" key="1">
+            <h4>是否开启：最后一分钟 提醒</h4>
+            <Switch onChange={this.onLastMinuteTipChange.bind(this)} />
+          </Panel>
           <Panel header="音量控制" key="1">
             <Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>
           </Panel>
