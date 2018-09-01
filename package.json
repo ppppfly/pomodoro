@@ -32,7 +32,6 @@
     "font-awesome": "^4.7.0",
     "gsap": "^2.0.1",
     "howler": "^2.0.14",
-    "i": "^0.3.6",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-responsive": "^5.0.0",
@@ -40,7 +39,7 @@
   },
   "devDependencies": {
     "babel-plugin-dva-hmr": "^0.3.2",
-    "electron": "^2.0.0",
+    "electron": "^2.0.8",
     "eslint": "^4.14.0",
     "eslint-config-umi": "^0.1.1",
     "eslint-plugin-flowtype": "^2.34.1",

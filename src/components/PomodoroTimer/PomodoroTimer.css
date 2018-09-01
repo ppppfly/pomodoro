@@ -7,40 +7,44 @@
   -ms-user-select: none;
   user-select: none; }
 
-.container {
+.container-mobile, .container-desktop {
   width: 100%;
   height: 100%;
-  min-width: 500px;
-  min-height: 500px;
-  background: #F2F2F2;
-  background-image: url("./img/FF5qM3y.jpg");
   background-size: cover;
   display: flex;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  background: #ff4444; }
 
-.main, .rest_main {
-  width: 500px;
-  height: 500px;
-  background: #ff4444;
+.container-desktop {
+  min-width: 500px;
+  min-height: 500px;
+  background: #F2F2F2;
+  background-image: url("./img/FF5qM3y.jpg"); }
+
+.main-mobile, .main-desktop, .main-desktop-rest, .main-mobile-rest {
   border-radius: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-  .main:hover, .rest_main:hover {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22); }
+  position: relative; }
 
-.rest_main {
+.main-desktop, .main-desktop-rest {
+  width: 500px;
+  height: 500px;
+  background: #ff4444;
+  overflow: hidden; }
+
+.main-mobile-rest, .main-desktop-rest {
   background: #68a662; }
-  .rest_main .tomato {
+  .main-mobile-rest .tomato, .main-desktop-rest .tomato {
     background: #68a662;
     box-shadow: 0px 0px #52884d, 1px 1px #52884d, 2px 2px #52884d, 3px 3px #52884d, 4px 4px #52884d, 5px 5px #52884d, 6px 6px #52884d, 7px 7px #52884d, 8px 8px #52884d, 9px 9px #52884d, 10px 10px #52884d, 11px 11px #52884d, 12px 12px #52884d, 13px 13px #52884d, 14px 14px #52884d, 15px 15px #52884d, 16px 16px #52884d, 17px 17px #52884d, 18px 18px #52884d, 19px 19px #52884d, 20px 20px #52884d, 21px 21px #52884d, 22px 22px #52884d, 23px 23px #52884d, 24px 24px #52884d, 25px 25px #52884d, 26px 26px #52884d, 27px 27px #52884d, 28px 28px #52884d, 29px 29px #52884d, 30px 30px #52884d, 31px 31px #52884d, 32px 32px #52884d, 33px 33px #52884d, 34px 34px #52884d, 35px 35px #52884d, 36px 36px #52884d, 37px 37px #52884d, 38px 38px #52884d, 39px 39px #52884d, 40px 40px #52884d, 41px 41px #52884d, 42px 42px #52884d, 43px 43px #52884d, 44px 44px #52884d, 45px 45px #52884d, 46px 46px #52884d, 47px 47px #52884d, 48px 48px #52884d, 49px 49px #52884d, 50px 50px #52884d, 51px 51px #52884d, 52px 52px #52884d, 53px 53px #52884d, 54px 54px #52884d, 55px 55px #52884d, 56px 56px #52884d, 57px 57px #52884d, 58px 58px #52884d, 59px 59px #52884d, 60px 60px #52884d, 61px 61px #52884d, 62px 62px #52884d, 63px 63px #52884d, 64px 64px #52884d, 65px 65px #52884d, 66px 66px #52884d, 67px 67px #52884d, 68px 68px #52884d, 69px 69px #52884d, 70px 70px #52884d, 71px 71px #52884d, 72px 72px #52884d, 73px 73px #52884d, 74px 74px #52884d, 75px 75px #52884d, 76px 76px #52884d, 77px 77px #52884d, 78px 78px #52884d, 79px 79px #52884d, 80px 80px #52884d, 81px 81px #52884d, 82px 82px #52884d, 83px 83px #52884d, 84px 84px #52884d, 85px 85px #52884d, 86px 86px #52884d, 87px 87px #52884d, 88px 88px #52884d, 89px 89px #52884d, 90px 90px #52884d, 91px 91px #52884d, 92px 92px #52884d, 93px 93px #52884d, 94px 94px #52884d, 95px 95px #52884d, 96px 96px #52884d, 97px 97px #52884d, 98px 98px #52884d, 99px 99px #52884d, 100px 100px #52884d, 101px 101px #52884d, 102px 102px #52884d, 103px 103px #52884d, 104px 104px #52884d, 105px 105px #52884d, 106px 106px #52884d, 107px 107px #52884d, 108px 108px #52884d, 109px 109px #52884d, 110px 110px #52884d, 111px 111px #52884d, 112px 112px #52884d, 113px 113px #52884d, 114px 114px #52884d, 115px 115px #52884d, 116px 116px #52884d, 117px 117px #52884d, 118px 118px #52884d, 119px 119px #52884d, 120px 120px #52884d, 121px 121px #52884d, 122px 122px #52884d, 123px 123px #52884d, 124px 124px #52884d, 125px 125px #52884d, 126px 126px #52884d, 127px 127px #52884d, 128px 128px #52884d, 129px 129px #52884d, 130px 130px #52884d, 131px 131px #52884d, 132px 132px #52884d, 133px 133px #52884d, 134px 134px #52884d, 135px 135px #52884d, 136px 136px #52884d, 137px 137px #52884d, 138px 138px #52884d, 139px 139px #52884d, 140px 140px #52884d, 141px 141px #52884d, 142px 142px #52884d, 143px 143px #52884d, 144px 144px #52884d, 145px 145px #52884d, 146px 146px #52884d, 147px 147px #52884d, 148px 148px #52884d, 149px 149px #52884d, 150px 150px #52884d, 151px 151px #52884d, 152px 152px #52884d, 153px 153px #52884d, 154px 154px #52884d, 155px 155px #52884d, 156px 156px #52884d, 157px 157px #52884d, 158px 158px #52884d, 159px 159px #52884d, 160px 160px #52884d, 161px 161px #52884d, 162px 162px #52884d, 163px 163px #52884d, 164px 164px #52884d, 165px 165px #52884d, 166px 166px #52884d, 167px 167px #52884d, 168px 168px #52884d, 169px 169px #52884d, 170px 170px #52884d, 171px 171px #52884d, 172px 172px #52884d, 173px 173px #52884d, 174px 174px #52884d, 175px 175px #52884d, 176px 176px #52884d, 177px 177px #52884d, 178px 178px #52884d, 179px 179px #52884d, 180px 180px #52884d, 181px 181px #52884d, 182px 182px #52884d, 183px 183px #52884d, 184px 184px #52884d, 185px 185px #52884d, 186px 186px #52884d, 187px 187px #52884d, 188px 188px #52884d, 189px 189px #52884d, 190px 190px #52884d, 191px 191px #52884d, 192px 192px #52884d, 193px 193px #52884d, 194px 194px #52884d, 195px 195px #52884d, 196px 196px #52884d, 197px 197px #52884d, 198px 198px #52884d, 199px 199px #52884d, 200px 200px #52884d; }
-  .rest_main .stem {
+  .main-mobile-rest .stem-mobile, .main-desktop-rest .stem-mobile {
     fill: #ffb700; }
+
+.main-desktop-rest .stem-desktop {
+  fill: #ffb700; }
 
 .tomato {
   width: 300px;
@@ -73,15 +77,25 @@
     text-align: center;
     top: 250px; }
 
-.stem {
+.stem-desktop {
   z-index: 2;
   width: 310px;
-  top: -56px;
-  left: 75px;
   height: auto;
   position: absolute;
   pointer-events: none;
-  fill: #21e521; }
+  fill: #21e521;
+  top: -56px;
+  left: 75px; }
+
+.stem-mobile {
+  z-index: 2;
+  width: 310px;
+  height: auto;
+  position: absolute;
+  pointer-events: none;
+  fill: #21e521;
+  top: -150px;
+  left: 0; }
 
 .timeline {
   width: 676px;
@@ -101,7 +115,7 @@
   top: 50px;
   left: 50px; }
 
-.shifter {
+.shifter-desktop, .shifter-mobile {
   position: absolute;
   bottom: 35px;
   width: 50px;
@@ -109,22 +123,24 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: center; }
-  .shifter .rest {
+  .shifter-desktop .rest, .shifter-mobile .rest {
     background-color: #68a662; }
-  .shifter .work {
+  .shifter-desktop .work, .shifter-mobile .work {
     background-color: #ff4444; }
+  .shifter-desktop div, .shifter-mobile div {
+    display: inline;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    border: solid 1px whitesmoke;
+    transition: all 0.3s;
+    cursor: pointer; }
+    .shifter-desktop div:hover, .shifter-mobile div:hover {
+      width: 18px;
+      height: 18px;
+      border-radius: 9px; }
 
-.shifter div {
-  display: inline;
-  width: 14px;
-  height: 14px;
-  border-radius: 7px;
-  border: solid 1px whitesmoke;
-  transition: all 0.3s;
-  cursor: pointer; }
-  .shifter div:hover {
-    width: 18px;
-    height: 18px;
-    border-radius: 9px; }
+.shifter-mobile {
+  bottom: -80px; }
 
 /*# sourceMappingURL=PomodoroTimer.css.map */

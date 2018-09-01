@@ -4,7 +4,7 @@ import 'font-awesome/css/font-awesome.css';
 import './font.css';
 import {Howl} from 'howler';
 import {Power1, TweenMax} from 'gsap';
-import {Drawer, Radio} from 'antd';
+import {Drawer, Radio, Collapse, Slider} from 'antd';
 
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -13,6 +13,7 @@ import Responsive from 'react-responsive';
 
 library.add(faVolumeUp, faVolumeOff, faCog);
 const RadioGroup = Radio.Group;
+const Panel = Collapse.Panel;
 const Mobile = props => <Responsive {...props} maxWidth={499} />;
 const Default = props => <Responsive {...props} minWidth={500} />;
 
@@ -192,7 +193,6 @@ class PomodoroTimer extends React.Component {
   }
 
   onDrawerOpenChange() {
-    console.log('--->', this.state.showDrawer);
     this.setState({showDrawer: !this.state.showDrawer})
   }
 
@@ -273,7 +273,7 @@ class PomodoroTimer extends React.Component {
   }
 
   onTouchStart(e) {
-    PomodoroTimer.handlePreventDefault(e);
+    // PomodoroTimer.handlePreventDefault(e);
     const pageX = e.touches[0].pageX;
     this.setState({
       isDragging: true,
@@ -283,59 +283,103 @@ class PomodoroTimer extends React.Component {
   }
 
   onTouchMove(e) {
-    PomodoroTimer.handlePreventDefault(e);
+    // PomodoroTimer.handlePreventDefault(e);
     const pageX = e.touches[0].pageX;
     this.handleMove.bind(this)(pageX);
   }
 
   onTouchEnd(e) {
-    PomodoroTimer.handlePreventDefault(e);
+    // PomodoroTimer.handlePreventDefault(e);
     this.setState({isDragging: false});
+  }
+
+  onClose = () => {
+    this.setState({showDrawer: false});
+  };
+
+  static genRestInlineStyle(isRest) {
+    let restStyle = {
+      container: {}
+    };
+
+    if (isRest) {
+      restStyle.container.backgroundColor = '#68a662';
+    }
+
+    return restStyle;
+  }
+
+  componentPomodoro(myStyle) {
+
+    const {tickSound, isRest} = this.state;
+
+    const marks = {0: '0', 50: '50', 100: '100'};
+
+    const restStyle = PomodoroTimer.genRestInlineStyle(isRest);
+
+    return <div className={myStyle.container} style={restStyle.container}>
+
+      <FontAwesomeIcon className={styles.sound} icon="cog" onClick={this.onDrawerOpenChange.bind(this)}/>
+
+      <Drawer
+        title="设置"
+        placement="left"
+        closable={true}
+        onClose={this.onClose}
+        visible={this.state.showDrawer}
+      >
+        <Collapse>
+          <Panel header="音量控制" key="1">
+            <Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>
+          </Panel>
+          <Panel header="声音：滴答声" key="2">
+            <RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>
+              <Radio value={0}>计时器</Radio>
+              <Radio value={1}>钟表（感谢叶开提供）</Radio>
+            </RadioGroup>
+          </Panel>
+        </Collapse>
+      </Drawer>
+
+      <div className={this.state.isRest ? myStyle.mainRest : myStyle.main } ref={this.mainRef}>
+        <FontAwesomeIcon className={styles.sound} icon={this.getIconName()} onClick={this.muteOrOpen.bind(this)}/>
+        <svg className={myStyle.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <use xlinkHref="#stempath"/>
+        </svg>
+        <div className={styles.tomato} onMouseDown={this.tomatoMouseDown.bind(this)} onTouchStart={this.onTouchStart.bind(this)}>
+          <div className={styles.title}>番茄钟</div>
+          <div style={this.renderTimerStyle()} className={styles.timeline} />
+        </div>
+        <div className={myStyle.shifter}>
+          <div className={styles.work} onClick={this.shiftWork.bind(this)}/>
+          <div className={styles.rest} onClick={this.shiftRest.bind(this)}/>
+        </div>
+      </div>
+
+    </div>;
+  }
+
+  static genStyle(type) {
+    return {
+      container: styles[`container-${type}`],
+      main: styles[`main-${type}`],
+      mainRest: styles[`main-${type}-rest`],
+      stem: styles[`stem-${type}`],
+      shifter: styles[`shifter-${type}`]
+    };
   }
 
   render() {
 
-    const {tickSound} = this.state;
-
-    const marks = {
-      0: '0',
-      50: '50',
-      100: '100'
-    };
+    const styleDesktop = PomodoroTimer.genStyle('desktop');
+    const styleMobile = PomodoroTimer.genStyle('mobile');
 
     return (
-      <div className={styles.container}
-           onMouseMove={this.onContainerMouseMove.bind(this)}
-           onMouseUp={this.onContainerMouseUp.bind(this)}
+      <div className={styles["container-mobile"]}
            onTouchMove={this.onTouchMove.bind(this)}
            onTouchEnd={this.onTouchEnd.bind(this)}
-      >
-
-        <FontAwesomeIcon className={styles.sound} icon="cog"
-                         onClick={this.onDrawerOpenChange.bind(this)}
-                         onTouchStart={this.onDrawerOpenChange.bind(this)}/>
-
-        <Drawer
-          title="设置"
-          placement="left"
-          closable={false}
-          onClose={this.onDrawerOpenChange.bind(this)}
-          visible={this.state.showDrawer}
-        >
-          {/*<Collapse>*/}
-            {/*<Panel header="音量控制" key="1">*/}
-              {/*<Slider marks={marks} value={tickSound.volume()*100} onChange={this.onVolumeChange.bind(this)}/>*/}
-            {/*</Panel>*/}
-            {/*<Panel header="声音：滴答声" key="2">*/}
-              {/*<RadioGroup onChange={this.getOnTickSoundChange.bind(this)} defaultValue={0}>*/}
-                {/*<Radio value={0}>计时器</Radio>*/}
-                {/*<Radio value={1}>钟表（感谢叶开提供）</Radio>*/}
-              {/*</RadioGroup>*/}
-            {/*</Panel>*/}
-          {/*</Collapse>*/}
-          点击
-
-        </Drawer>
+           onMouseMove={this.onContainerMouseMove.bind(this)}
+           onMouseUp={this.onContainerMouseUp.bind(this)}>
 
         <svg style={{'display': 'none'}}>
           <defs>
@@ -344,27 +388,16 @@ class PomodoroTimer extends React.Component {
           </defs>
         </svg>
 
-        <div className={this.state.isRest ? styles.rest_main : styles.main } ref={this.mainRef}>
-          <FontAwesomeIcon className={styles.sound} icon={this.getIconName()}
-                           onClick={this.muteOrOpen.bind(this)} onTouchStart={this.muteOrOpen.bind(this)}/>
-          <svg className={styles.stem} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <use xlinkHref="#stempath"/>
-          </svg>
-          <div className={styles.tomato} onMouseDown={this.tomatoMouseDown.bind(this)} onTouchStart={this.onTouchStart.bind(this)}>
-            <div className={styles.title}>番茄钟
-              <div>
-                <Mobile>Mobile</Mobile>
-                <Default>Not mobile</Default>
-              </div>
-            </div>
-            <div style={this.renderTimerStyle()} className={styles.timeline} />
-          </div>
-          <div className={styles.shifter}>
-            <div className={styles.work} onClick={this.shiftWork.bind(this)} onTouchStart={this.shiftWork.bind(this)}/>
-            <div className={styles.rest} onClick={this.shiftRest.bind(this)}  onTouchStart={this.shiftRest.bind(this)}/>
-          </div>
-        </div>
+        <Mobile>
 
+          {this.componentPomodoro(styleMobile)}
+
+        </Mobile>
+        <Default>
+
+          {this.componentPomodoro(styleDesktop)}
+
+        </Default>
       </div>
     )
   }
