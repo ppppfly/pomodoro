@@ -22,6 +22,12 @@
   background: #F2F2F2;
   background-image: url("./img/FF5qM3y.jpg"); }
 
+.switch-wrapper {
+  width: 40%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; }
+
 .main-mobile, .main-desktop, .main-desktop-rest, .main-mobile-rest {
   border-radius: 100px;
   display: flex;

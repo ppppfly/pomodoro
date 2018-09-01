@@ -4,7 +4,7 @@ import 'font-awesome/css/font-awesome.css';
 import './font.css';
 import {Howl} from 'howler';
 import {Power1, TweenMax} from 'gsap';
-import {Drawer, Radio, Collapse, Slider, Switch} from 'antd';
+import {Drawer, Radio, Collapse, Slider, Switch, Icon, Tooltip} from 'antd';
 
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -64,6 +64,8 @@ class PomodoroTimer extends React.Component {
     isDingRing: false, // 标记：是否已经提醒了：倒数一分钟，提醒用户准备结束工作
     willLastMinuteCheck: false, //设置：是否开启 最后一分钟提醒
     willContinueHalfMinute: false, //设置：是否开启 结束后马上半分钟脑波音乐
+    willContinueAfterWork: false, //设置：是否开启 工作结束后，马上休息
+    willContinueAfterRest: false, //设置：是否开启 休息结束后，马上工作
   };
 
   tomatoMouseDown = (e) => {
@@ -189,6 +191,20 @@ class PomodoroTimer extends React.Component {
       if (!isRest && willContinueHalfMinute) {
         this.playRestSound(30*1000)
       }
+
+      const {willContinueAfterWork, willContinueAfterRest} = this.state;
+      if (!isRest && willContinueAfterWork) {
+        tickSound.stop();
+        this.startRest();
+        return;
+      }
+
+      if (isRest && willContinueAfterRest) {
+        tickSound.stop();
+        this.startWork();
+        return;
+      }
+
     }
     this.setState({lastTick, isDragging, timePos, isTickPlaying, pixelPos, isDingRing})
   };
@@ -387,6 +403,47 @@ class PomodoroTimer extends React.Component {
     this.setState({willContinueHalfMinute: !this.state.willContinueHalfMinute})
   }
 
+  onContinueAfterWorkChange() {
+    this.setState({
+      willContinueAfterWork: !this.state.willContinueAfterWork,
+      willContinueHalfMinute: false
+    })
+  }
+
+  onContinueAfterRestChange() {
+    this.setState({willContinueAfterRest: !this.state.willContinueAfterRest})
+  }
+
+  startWork(minutes=25) {
+    const {secondsWidth, timeMultiplier} = this.props;
+    minutes = Math.min(secondsWidth, minutes);
+    this.setState({
+      lastTick: Date.now(),
+      timePos: minutes * timeMultiplier,
+      isRest: false,
+      tickSound: this.props.tickSounds[0],
+      isDragging: false,
+      oldPosX: 0,
+      isTickPlaying: false,
+      isDingRing: false,
+    })
+  }
+
+  startRest(minutes=5) {
+    const {secondsWidth, timeMultiplier} = this.props;
+    minutes = Math.min(secondsWidth, minutes);
+    this.setState({
+      lastTick: Date.now(),
+      timePos: minutes * timeMultiplier,
+      isRest: true,
+      tickSound: this.props.restSounds[0],
+      isDragging: false,
+      oldPosX: 0,
+      isTickPlaying: false,
+      isDingRing: false,
+    })
+  }
+
   componentPomodoro(myStyle, isMobile) {
 
     const {isRest, volume} = this.state;
@@ -415,9 +472,23 @@ class PomodoroTimer extends React.Component {
         <Collapse>
           <Panel header="模式控制" key="1">
             <h4>最后一分钟提醒</h4>
-            <Switch onChange={this.onLastMinuteTipChange.bind(this)} />
+            <Switch checked={this.state.willLastMinuteCheck}
+                    onChange={this.onLastMinuteTipChange.bind(this)}/>
             <h4>工作番茄后，持续30秒的脑波音乐</h4>
-            <Switch onChange={this.onWorkContinueHalfMinuteChange.bind(this)} />
+            <div className={styles["switch-wrapper"]}>
+              <Switch checked={this.state.willContinueHalfMinute}
+                      onChange={this.onWorkContinueHalfMinuteChange.bind(this)}
+                      disabled={this.state.willContinueAfterWork}/>
+              <Tooltip placement="top" title="连续番茄模式下，会强制关闭 30 秒脑波音乐">
+                <Icon type="question-circle"/>
+              </Tooltip>
+            </div>
+            <h4>工作番茄后，立即开始休息番茄</h4>
+            <Switch checked={this.state.willContinueAfterWork}
+                    onChange={this.onContinueAfterWorkChange.bind(this)} />
+            <h4>休息番茄后，立即开始工作番茄</h4>
+            <Switch checked={this.state.willContinueAfterRest}
+                    onChange={this.onContinueAfterRestChange.bind(this)} />
           </Panel>
           <Panel header="音量控制" key="2">
             <Slider marks={marks} value={volume*100} onChange={this.onVolumeChange.bind(this)}/>
