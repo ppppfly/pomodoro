@@ -68,6 +68,32 @@ class PomodoroTimer extends React.Component {
     willContinueAfterRest: false, //设置：是否开启 休息结束后，马上工作
   };
 
+  static storageGet(key) {
+    const value = localStorage.getItem(key);
+    if (!isNaN(value)) return +value;
+    if (value == null) return null;
+    if (value === 'false') return false;
+    if (value === 'true') return true;
+    else return value;
+  }
+
+  componentDidMount = () => {
+    this.mainRef = React.createRef();
+    this.doTick();
+
+    let willLastMinuteCheck = PomodoroTimer.storageGet('willLastMinuteCheck') || false;
+    let willContinueHalfMinute = PomodoroTimer.storageGet('willContinueHalfMinute') || false;
+    let willContinueAfterWork = PomodoroTimer.storageGet('willContinueAfterWork') || false;
+    let willContinueAfterRest = PomodoroTimer.storageGet('willContinueAfterRest') || false;
+
+    this.setState({
+      willLastMinuteCheck,
+      willContinueHalfMinute,
+      willContinueAfterWork,
+      willContinueAfterRest
+    })
+  };
+
   tomatoMouseDown = (e) => {
     e.preventDefault();
     this.setState({isDragging: true})
@@ -233,11 +259,6 @@ class PomodoroTimer extends React.Component {
     });
   };
 
-  componentDidMount = () => {
-    this.mainRef = React.createRef();
-    this.doTick();
-  };
-
   getIconName(){
     if (this.state.isMute) {
       return 'volume-off'
@@ -396,22 +417,31 @@ class PomodoroTimer extends React.Component {
   }
 
   onLastMinuteTipChange() {
-    this.setState({willLastMinuteCheck: !this.state.willLastMinuteCheck})
+    let new_value = !this.state.willLastMinuteCheck;
+    this.setState({willLastMinuteCheck: new_value});
+    localStorage.setItem('willLastMinuteCheck', new_value);
   }
 
   onWorkContinueHalfMinuteChange() {
-    this.setState({willContinueHalfMinute: !this.state.willContinueHalfMinute})
+    let new_value = !this.state.willContinueHalfMinute;
+    this.setState({willContinueHalfMinute: new_value});
+    localStorage.setItem('willContinueHalfMinute', new_value);
   }
 
   onContinueAfterWorkChange() {
+    let new_value = !this.state.willContinueAfterWork;
     this.setState({
-      willContinueAfterWork: !this.state.willContinueAfterWork,
+      willContinueAfterWork: new_value,
       willContinueHalfMinute: false
-    })
+    });
+    localStorage.setItem('willContinueAfterWork', new_value);
+    localStorage.setItem('willContinueHalfMinute', false);
   }
 
   onContinueAfterRestChange() {
-    this.setState({willContinueAfterRest: !this.state.willContinueAfterRest})
+    let new_value = !this.state.willContinueAfterRest;
+    this.setState({willContinueAfterRest: new_value});
+    localStorage.setItem('willContinueAfterRest', new_value);
   }
 
   startWork(minutes=25) {
