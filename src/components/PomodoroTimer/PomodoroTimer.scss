@@ -19,6 +19,8 @@ $color5: #F2F2F2;
   box-shadow: makelongshadow($color);
 }
 
+::-webkit-scrollbar{display:none;}
+
 * {
   moz-user-select: -moz-none;
   -moz-user-select: none;
